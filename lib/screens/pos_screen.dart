@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/isar_service.dart';
 import '../models/order.dart';
+import '../models/product.dart';
 import '../theme/app_theme.dart';
 import '../widgets/profile_modal_widget.dart';
 
@@ -15,12 +16,25 @@ class _PosScreenState extends State<PosScreen> {
   final IsarService _isarService = IsarService();
   String _businessName = "Cargando...";
   String _userName = "Usuario";
-  String _userEmail = "correo@ejemplo.com";
+
+  List<Product> _products = [];
 
   @override
   void initState() {
     super.initState();
     _loadHeaderData();
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts() async {
+    // Si no hay productos, poblamos la base de datos con los de ejemplo
+    await _isarService.seedProductsIfEmpty();
+    final products = await _isarService.getAvailableProducts();
+    if (mounted) {
+      setState(() {
+        _products = products;
+      });
+    }
   }
 
   Future<void> _loadHeaderData() async {
@@ -30,30 +44,25 @@ class _PosScreenState extends State<PosScreen> {
       setState(() {
         _businessName = config?.businessName ?? "PioSystem POS";
         _userName = user?.name ?? "Cajero(a)";
-        _userEmail = user?.email ?? "Sin correo";
       });
     }
   }
 
-  // Mock data para el MVP visual
-  final List<Map<String, dynamic>> _products = [
-    {"name": "1/4 de Pollo", "price": 18.00, "category": "Platos"},
-    {"name": "1/2 Pollo", "price": 32.00, "category": "Platos"},
-    {"name": "Pollo Entero", "price": 60.00, "category": "Platos"},
-    {"name": "Porción de Papas", "price": 10.00, "category": "Extras"},
-    {"name": "Gaseosa 1L", "price": 8.00, "category": "Bebidas"},
-    {"name": "Gaseosa Personal", "price": 4.00, "category": "Bebidas"},
-  ];
-
   final List<Map<String, dynamic>> _cart = [];
 
-  void _addToCart(Map<String, dynamic> product) {
+  void _addToCart(Product product) {
     setState(() {
-      var existing = _cart.where((item) => item['name'] == product['name']);
+      var existing = _cart.where((item) => item['id'] == product.id);
       if (existing.isNotEmpty) {
         existing.first['quantity']++;
       } else {
-        _cart.add({...product, 'quantity': 1});
+        _cart.add({
+          'id': product.id,
+          'name': product.name,
+          'price': product.price,
+          'category': product.category,
+          'quantity': 1
+        });
       }
     });
   }
@@ -79,11 +88,11 @@ class _PosScreenState extends State<PosScreen> {
 
     List<OrderItem> items = _cart.map((item) {
       return OrderItem()
-        ..productId = 0 // Mock ID para MVP
-        ..productName = item['name']
-        ..unitPrice = item['price']
-        ..quantity = item['quantity']
-        ..subtotal = item['price'] * item['quantity'];
+        ..productId = item['id'] as int
+        ..productName = item['name'] as String
+        ..unitPrice = item['price'] as double
+        ..quantity = item['quantity'] as int
+        ..subtotal = (item['price'] * item['quantity']) as double;
     }).toList();
 
     await _isarService.saveOrder(order, items);
@@ -190,16 +199,20 @@ class _PosScreenState extends State<PosScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.fastfood, size: 40, color: context.colors.primary),
+                              Icon(
+                                product.category.toLowerCase() == 'bebidas' ? Icons.local_drink : Icons.fastfood, 
+                                size: 40, 
+                                color: context.colors.primary
+                              ),
                               const SizedBox(height: 12),
                               Text(
-                                product['name'],
+                                product.name,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                "S/ ${product['price'].toStringAsFixed(2)}",
+                                "S/ ${product.price.toStringAsFixed(2)}",
                                 style: TextStyle(color: context.colors.textSecondary),
                               ),
                             ],

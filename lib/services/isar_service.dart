@@ -27,15 +27,42 @@ class IsarService {
     return Future.value(Isar.getInstance());
   }
 
-  // Métodos de ejemplo para interactuar con la base de datos
   Future<void> saveProduct(Product newProduct) async {
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.products.putSync(newProduct));
   }
 
+  Future<void> deleteProduct(int id) async {
+    final isar = await db;
+    isar.writeTxnSync(() => isar.products.deleteSync(id));
+  }
+
   Future<List<Product>> getAllProducts() async {
     final isar = await db;
     return await isar.products.where().findAll();
+  }
+
+  Future<List<Product>> getAvailableProducts() async {
+    final isar = await db;
+    return await isar.products.filter().isAvailableEqualTo(true).findAll();
+  }
+
+  Future<void> seedProductsIfEmpty() async {
+    final isar = await db;
+    final count = await isar.products.count();
+    if (count == 0) {
+      final initialProducts = [
+        Product()..name = "1/4 de Pollo"..price = 18.00..category = "Platos",
+        Product()..name = "1/2 Pollo"..price = 32.00..category = "Platos",
+        Product()..name = "Pollo Entero"..price = 60.00..category = "Platos",
+        Product()..name = "Porción de Papas"..price = 10.00..category = "Extras",
+        Product()..name = "Gaseosa 1L"..price = 8.00..category = "Bebidas",
+        Product()..name = "Gaseosa Personal"..price = 4.00..category = "Bebidas",
+      ];
+      await isar.writeTxn(() async {
+        await isar.products.putAll(initialProducts);
+      });
+    }
   }
 
   // --- MÉTODOS DE REGISTRO (PRIMER USO) ---

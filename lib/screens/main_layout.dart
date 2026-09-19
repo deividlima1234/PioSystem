@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'pos_screen.dart';
 import 'history_screen.dart';
+import 'catalog_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/profile_modal_widget.dart';
 import '../services/isar_service.dart';
@@ -43,6 +44,7 @@ class _MainLayoutState extends State<MainLayout> {
     final List<Widget> screens = [
       const PosScreen(),
       Center(child: Text("Cuentas Abiertas (En Desarrollo)", style: TextStyle(color: context.colors.textPrimary))),
+      const CatalogScreen(),
       const HistoryScreen(),
       Center(child: Text("Cierre de Caja (En Desarrollo)", style: TextStyle(color: context.colors.textPrimary))),
       _buildSettingsScreen(),
@@ -140,9 +142,10 @@ class _MainLayoutState extends State<MainLayout> {
                         children: [
                           _buildNavItem(Icons.point_of_sale, "Ventas", 0),
                           _buildNavItem(Icons.table_restaurant, "Cuentas", 1),
-                          _buildNavItem(Icons.history, "Historial", 2),
-                          _buildNavItem(Icons.receipt_long, "Cierre", 3),
-                          _buildNavItem(Icons.settings, "Ajustes", 4),
+                          _buildNavItem(Icons.inventory_2_outlined, "Catálogo", 2),
+                          _buildNavItem(Icons.history, "Historial", 3),
+                          _buildNavItem(Icons.receipt_long, "Cierre", 4),
+                          _buildNavItem(Icons.settings, "Ajustes", 5),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Divider(color: context.colors.borderLight),

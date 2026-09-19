@@ -9,6 +9,7 @@ enum AppThemeType {
 
 class AppColors {
   final Color primary;
+  final Color onPrimary;
   final Color primaryDark;
   final Color background;
   final Color surface;
@@ -23,6 +24,7 @@ class AppColors {
   final Color borderFaintest;
   final Color success;
   final Color error;
+  final Color onError;
   final Color errorAccent;
   final Color black;
   final Color transparent;
@@ -30,6 +32,7 @@ class AppColors {
 
   const AppColors({
     required this.primary,
+    required this.onPrimary,
     required this.primaryDark,
     required this.background,
     required this.surface,
@@ -44,6 +47,7 @@ class AppColors {
     required this.borderFaintest,
     required this.success,
     required this.error,
+    required this.onError,
     required this.errorAccent,
     required this.black,
     required this.transparent,
@@ -53,6 +57,7 @@ class AppColors {
   static const AppColors darkRed = AppColors(
     isDark: true,
     primary: Color(0xFFFF003C), 
+    onPrimary: Colors.white,
     primaryDark: Color(0xFF990024),
     background: Color(0xFF0A0A0A),
     surface: Color(0xFF1A1A1A),
@@ -67,6 +72,7 @@ class AppColors {
     borderFaintest: Colors.white10,
     success: Colors.greenAccent,
     error: Colors.red,
+    onError: Colors.white,
     errorAccent: Colors.redAccent,
     black: Colors.black,
     transparent: Colors.transparent,
@@ -75,6 +81,7 @@ class AppColors {
   static const AppColors lightBlue = AppColors(
     isDark: false,
     primary: Color(0xFF1565C0), // Azul principal
+    onPrimary: Colors.white, // Texto en azul principal
     primaryDark: Color(0xFF0D47A1), // Azul oscuro
     background: Color(0xFFF5F5F5), // Fondo general gris suave
     surface: Color(0xFFFFFFFF), // Tarjetas blancas
@@ -89,6 +96,7 @@ class AppColors {
     borderFaintest: Color(0xFFEEEEEE),
     success: Colors.green,
     error: Colors.red,
+    onError: Colors.white,
     errorAccent: Colors.redAccent,
     black: Colors.black,
     transparent: Colors.transparent,
@@ -117,11 +125,11 @@ class ThemeProvider extends ChangeNotifier {
       colorScheme: ColorScheme(
         brightness: colors.isDark ? Brightness.dark : Brightness.light,
         primary: colors.primary,
-        onPrimary: Colors.white,
+        onPrimary: colors.onPrimary,
         secondary: colors.primaryDark,
         onSecondary: Colors.white,
         error: colors.error,
-        onError: Colors.white,
+        onError: colors.onError,
         surface: colors.surface,
         onSurface: colors.textPrimary,
         background: colors.background,
