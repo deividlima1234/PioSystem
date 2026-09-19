@@ -128,7 +128,7 @@ class _PosScreenState extends State<PosScreen> {
                       ),
                     ),
                     InkWell(
-                      onTap: () => ProfileModal.show(context, userName: _userName, role: "Administrador / Responsable"),
+                      onTap: () => ProfileModal.show(context),
                       borderRadius: BorderRadius.circular(24),
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),

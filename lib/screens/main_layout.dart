@@ -4,6 +4,8 @@ import 'pos_screen.dart';
 import 'history_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/profile_modal_widget.dart';
+import '../services/isar_service.dart';
+import '../models/user.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -15,6 +17,24 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int _selectedIndex = 0;
   bool _isSidebarOpen = false; // Empezar colapsado en móviles
+  String _userName = "Cargando...";
+  String _userRole = "---";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final user = await IsarService().getFirstAdmin();
+    if (mounted && user != null) {
+      setState(() {
+        _userName = user.name;
+        _userRole = user.role == Role.admin ? "Administrador" : "Cajero";
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +170,7 @@ class _MainLayoutState extends State<MainLayout> {
                     InkWell(
                       onTap: () {
                         setState(() => _isSidebarOpen = false);
-                        ProfileModal.show(context, userName: 'Admin User', role: 'Administrador');
+                        ProfileModal.show(context);
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -160,7 +180,7 @@ class _MainLayoutState extends State<MainLayout> {
                             CircleAvatar(
                               backgroundColor: context.colors.primary,
                               child: Text(
-                                'A', // Letra inicial
+                                _userName.length > 1 ? _userName[0].toUpperCase() : 'U',
                                 style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -169,15 +189,8 @@ class _MainLayoutState extends State<MainLayout> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'Admin User',
-                                    style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    'Administrador',
-                                    style: TextStyle(color: context.colors.textMuted, fontSize: 13),
-                                  ),
+                                  Text(_userName, style: TextStyle(fontWeight: FontWeight.bold, color: context.colors.textPrimary)),
+                                  Text(_userRole, style: TextStyle(color: context.colors.textSecondary, fontSize: 12)),
                                 ],
                               ),
                             ),

@@ -1,151 +1,164 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../services/isar_service.dart';
+import '../models/user.dart';
 
 class ProfileModal {
-  static void show(BuildContext context, {required String userName, required String role}) {
+  static void show(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: context.readColors.transparent,
       builder: (modalContext) {
-        return Container(
-          height: MediaQuery.of(modalContext).size.height * 0.75,
-          decoration: BoxDecoration(
-            color: modalContext.colors.background,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            children: [
-              // Header con gradiente y avatar superpuesto
-              Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.center,
+        return FutureBuilder<User?>(
+          future: IsarService().getFirstAdmin(),
+          builder: (context, snapshot) {
+            final user = snapshot.data;
+            final userName = user?.name ?? "Cargando...";
+            final email = user?.email ?? "---";
+            final roleName = user?.role == Role.admin ? "Administrador" : "Cajero";
+            final employeeId = user != null ? "#${user.id.toString().padLeft(3, '0')}" : "#000";
+
+            return Container(
+              height: MediaQuery.of(modalContext).size.height * 0.75,
+              decoration: BoxDecoration(
+                color: modalContext.colors.background,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
                 children: [
-                  Container(
-                    height: 140,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [modalContext.colors.primary, modalContext.colors.primaryDark],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                    ),
-                  ),
-                  Positioned(
-                    top: 10,
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: modalContext.colors.textPrimary.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: -40, // Avatar mitad adentro, mitad afuera
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        CircleAvatar(
-                          radius: 54,
-                          backgroundColor: modalContext.colors.background,
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundColor: modalContext.colors.surface,
-                            child: Text(
-                              userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
-                              style: TextStyle(fontSize: 40, color: modalContext.colors.primary, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                        CircleAvatar(
-                          radius: 16,
-                          backgroundColor: modalContext.colors.background,
-                          child: CircleAvatar(
-                            radius: 14,
-                            backgroundColor: modalContext.colors.surface,
-                            child: Icon(Icons.camera_alt, size: 16, color: modalContext.colors.primary),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 50), // Espacio para el avatar
-              // Info del usuario
-              Text(
-                userName,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: modalContext.colors.textPrimary),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: modalContext.colors.surface,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: modalContext.colors.primary),
-                ),
-                child: Text(
-                  role.toUpperCase(),
-                  style: TextStyle(color: modalContext.colors.primary, fontWeight: FontWeight.w600, fontSize: 12),
-                ),
-              ),
-              const SizedBox(height: 24),
-              // Tarjetas de información
-              Expanded(
-                child: Container(
-                  color: modalContext.colors.background,
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                  // Header con gradiente y avatar superpuesto
+                  Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
                     children: [
-                      _buildSectionHeader("INFORMACIÓN PERSONAL", modalContext),
-                      _buildDarkInfoCard([
-                        _buildDarkInfoRow(Icons.person_outline, "Nombre de Usuario", userName.toLowerCase().replaceAll(' ', ''), modalContext),
-                        Divider(height: 1, indent: 50, color: modalContext.colors.borderFaintest),
-                        _buildDarkInfoRow(Icons.badge_outlined, "ID de Empleado", "#001", modalContext),
-                      ], modalContext),
-                      const SizedBox(height: 20),
-                      _buildSectionHeader("ESTADO DE CUENTA", modalContext),
-                      _buildDarkInfoCard([
-                        _buildDarkInfoRow(
-                          Icons.verified_user_outlined,
-                          "Estado",
-                          "Activo",
-                          modalContext,
-                          valueColor: modalContext.colors.success,
+                      Container(
+                        height: 140,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [modalContext.colors.primary, modalContext.colors.primaryDark],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                         ),
-                      ], modalContext),
+                      ),
+                      Positioned(
+                        top: 10,
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: modalContext.colors.textPrimary.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: -40, // Avatar mitad adentro, mitad afuera
+                        child: Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            CircleAvatar(
+                              radius: 54,
+                              backgroundColor: modalContext.colors.background,
+                              child: CircleAvatar(
+                                radius: 50,
+                                backgroundColor: modalContext.colors.surface,
+                                child: Text(
+                                  userName.length > 1 ? userName[0].toUpperCase() : 'U',
+                                  style: TextStyle(fontSize: 40, color: modalContext.colors.primary, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            CircleAvatar(
+                              radius: 16,
+                              backgroundColor: modalContext.colors.background,
+                              child: CircleAvatar(
+                                radius: 14,
+                                backgroundColor: modalContext.colors.surface,
+                                child: Icon(Icons.camera_alt, size: 16, color: modalContext.colors.primary),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                     ],
                   ),
-                ),
-              ),
-              // Botón Cerrar
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: modalContext.colors.background,
-                  border: Border(top: BorderSide(color: modalContext.colors.borderFaintest)),
-                ),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(modalContext),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: modalContext.colors.primary,
-                      foregroundColor: modalContext.colors.textPrimary,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: const Text("Cerrar", style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 50), // Espacio para el avatar
+                  // Info del usuario
+                  Text(
+                    userName,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: modalContext.colors.textPrimary),
                   ),
-                ),
-              )
-            ],
-          ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: modalContext.colors.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: modalContext.colors.primary),
+                    ),
+                    child: Text(
+                      roleName.toUpperCase(),
+                      style: TextStyle(color: modalContext.colors.primary, fontWeight: FontWeight.w600, fontSize: 12),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Tarjetas de información
+                  Expanded(
+                    child: Container(
+                      color: modalContext.colors.background,
+                      child: ListView(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        children: [
+                          _buildSectionHeader("INFORMACIÓN PERSONAL", modalContext),
+                          _buildDarkInfoCard([
+                            _buildDarkInfoRow(Icons.email_outlined, "Correo Electrónico", email, modalContext),
+                            Divider(height: 1, indent: 50, color: modalContext.colors.borderFaintest),
+                            _buildDarkInfoRow(Icons.badge_outlined, "ID de Empleado", employeeId, modalContext),
+                          ], modalContext),
+                          const SizedBox(height: 20),
+                          _buildSectionHeader("ESTADO DE CUENTA", modalContext),
+                          _buildDarkInfoCard([
+                            _buildDarkInfoRow(
+                              Icons.verified_user_outlined,
+                              "Estado",
+                              "Activo",
+                              modalContext,
+                              valueColor: modalContext.colors.success,
+                            ),
+                          ], modalContext),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Botón Cerrar
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: modalContext.colors.background,
+                      border: Border(top: BorderSide(color: modalContext.colors.borderFaintest)),
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(modalContext),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: modalContext.colors.primary,
+                          foregroundColor: modalContext.colors.textPrimary,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: const Text("Cerrar", style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            );
+          },
         );
       },
     );
