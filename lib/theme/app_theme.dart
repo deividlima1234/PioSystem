@@ -160,4 +160,5 @@ class ThemeProvider extends ChangeNotifier {
 
 extension ThemeContext on BuildContext {
   AppColors get colors => watch<ThemeProvider>().colors;
+  AppColors get readColors => read<ThemeProvider>().colors;
 }

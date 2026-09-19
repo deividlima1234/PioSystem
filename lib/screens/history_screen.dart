@@ -40,7 +40,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: context.colors.transparent,
+      backgroundColor: context.readColors.transparent,
       isScrollControlled: true,
       builder: (context) {
         return Container(

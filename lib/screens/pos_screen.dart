@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/isar_service.dart';
 import '../models/order.dart';
 import '../theme/app_theme.dart';
+import '../widgets/profile_modal_widget.dart';
 
 class PosScreen extends StatefulWidget {
   const PosScreen({super.key});
@@ -127,10 +128,15 @@ class _PosScreenState extends State<PosScreen> {
                       ),
                     ),
                     InkWell(
-                      onTap: _showProfileBottomSheet,
+                      onTap: () => ProfileModal.show(context, userName: _userName, role: "Administrador / Responsable"),
                       borderRadius: BorderRadius.circular(24),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                        decoration: BoxDecoration(
+                          color: context.colors.surface,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: context.colors.borderLight),
+                        ),
                         child: Row(
                           children: [
                             Text(
@@ -139,10 +145,11 @@ class _PosScreenState extends State<PosScreen> {
                             ),
                             const SizedBox(width: 12),
                             CircleAvatar(
+                              radius: 16,
                               backgroundColor: context.colors.borderFaint,
                               child: Text(
                                 _userName.isNotEmpty ? _userName[0].toUpperCase() : 'U',
-                                style: TextStyle(color: context.colors.primary, fontWeight: FontWeight.bold),
+                                style: TextStyle(color: context.colors.primary, fontWeight: FontWeight.bold, fontSize: 14),
                               ),
                             ),
                           ],
@@ -229,75 +236,12 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  void _showProfileBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: context.colors.transparent,
-      builder: (context) {
-        return Container(
-          decoration: BoxDecoration(
-            color: context.colors.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 50,
-                height: 5,
-                margin: const EdgeInsets.only(bottom: 24),
-                decoration: BoxDecoration(
-                  color: context.colors.borderLight,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              CircleAvatar(
-                radius: 40,
-                backgroundColor: context.colors.borderFaint,
-                child: Text(
-                  _userName.isNotEmpty ? _userName[0].toUpperCase() : 'U',
-                  style: TextStyle(color: context.colors.primary, fontSize: 32, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(_userName, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: context.colors.textPrimary)),
-              Text(_userEmail, style: TextStyle(fontSize: 16, color: context.colors.textSecondary)),
-              const SizedBox(height: 32),
-              Divider(color: context.colors.borderFaint),
-              const SizedBox(height: 16),
-              _buildProfileRow(Icons.store, "Negocio", _businessName),
-              const SizedBox(height: 16),
-              _buildProfileRow(Icons.admin_panel_settings, "Rol", "Administrador / Responsable"),
-              const SizedBox(height: 32),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildProfileRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Icon(icon, color: context.colors.primary, size: 28),
-        const SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: TextStyle(color: context.colors.textSecondary, fontSize: 12)),
-            Text(value, style: TextStyle(color: context.colors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
-          ],
-        )
-      ],
-    );
-  }
 
   void _showCartBottomSheet() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: context.colors.transparent,
+      backgroundColor: context.readColors.transparent,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
@@ -336,7 +280,7 @@ class _PosScreenState extends State<PosScreen> {
       barrierDismissible: false,
       builder: (context) {
         return Dialog(
-          backgroundColor: context.colors.surface,
+          backgroundColor: context.readColors.surface,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Padding(
             padding: const EdgeInsets.all(32.0),

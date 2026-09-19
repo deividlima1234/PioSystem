@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 class NumPadWidget extends StatelessWidget {
   final Function(String) onNumberTap;
@@ -48,9 +49,9 @@ class NumPadWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildActionButton(Icons.clear, onClearTap, context, color: Colors.redAccent),
+              _buildActionButton(Icons.clear, onClearTap, context, color: context.colors.errorAccent),
               _buildNumberButton('0', context),
-              _buildActionButton(Icons.backspace, onDeleteTap, context),
+              _buildActionButton(Icons.backspace, onDeleteTap, context, color: context.colors.textSecondary),
             ],
           ),
         ],
@@ -67,16 +68,16 @@ class NumPadWidget extends StatelessWidget {
         height: 70,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white24, width: 2),
-          color: Theme.of(context).colorScheme.surface,
+          border: Border.all(color: context.colors.borderLight, width: 2),
+          color: context.colors.surface,
         ),
         child: Center(
           child: Text(
             number,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: context.colors.textPrimary,
             ),
           ),
         ),
@@ -84,7 +85,7 @@ class NumPadWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(IconData icon, VoidCallback onTap, BuildContext context, {Color color = Colors.white54}) {
+  Widget _buildActionButton(IconData icon, VoidCallback onTap, BuildContext context, {Color? color}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(40),
@@ -98,7 +99,7 @@ class NumPadWidget extends StatelessWidget {
           child: Icon(
             icon,
             size: 32,
-            color: color,
+            color: color ?? context.colors.textSecondary,
           ),
         ),
       ),
