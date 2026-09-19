@@ -124,6 +124,8 @@ class ThemeProvider extends ChangeNotifier {
         onError: Colors.white,
         surface: colors.surface,
         onSurface: colors.textPrimary,
+        background: colors.background,
+        onBackground: colors.textPrimary,
       ),
       textTheme: TextTheme(
         bodyLarge: TextStyle(color: colors.textPrimary),
