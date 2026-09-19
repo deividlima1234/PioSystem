@@ -150,6 +150,13 @@ class IsarService {
     return await isar.appConfigs.where().findFirst();
   }
 
+  Future<void> updateAppConfig(AppConfig config) async {
+    final isar = await db;
+    await isar.writeTxn(() async {
+      await isar.appConfigs.put(config);
+    });
+  }
+
   Future<User?> getFirstAdmin() async {
     final isar = await db;
     return await isar.users.filter().roleEqualTo(Role.admin).findFirst();
@@ -177,5 +184,23 @@ class IsarService {
   Future<List<Order>> getAllOrders() async {
     final isar = await db;
     return await isar.orders.where().sortByCreatedAtDesc().findAll();
+  }
+
+  Future<List<Order>> getTodayOrders() async {
+    final isar = await db;
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day, 0, 0, 0);
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
+    
+    final orders = await isar.orders.filter()
+      .createdAtBetween(startOfDay, endOfDay)
+      .sortByCreatedAtDesc()
+      .findAll();
+      
+    for (var order in orders) {
+      await order.items.load();
+    }
+    
+    return orders;
   }
 }

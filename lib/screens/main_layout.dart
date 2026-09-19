@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'pos_screen.dart';
 import 'history_screen.dart';
 import 'catalog_screen.dart';
+import 'close_screen.dart';
+import 'settings_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/profile_modal_widget.dart';
 import '../services/isar_service.dart';
@@ -46,8 +48,8 @@ class _MainLayoutState extends State<MainLayout> {
       Center(child: Text("Cuentas Abiertas (En Desarrollo)", style: TextStyle(color: context.colors.textPrimary))),
       const CatalogScreen(),
       const HistoryScreen(),
-      Center(child: Text("Cierre de Caja (En Desarrollo)", style: TextStyle(color: context.colors.textPrimary))),
-      _buildSettingsScreen(),
+      const CloseScreen(),
+      const SettingsScreen(),
     ];
 
     return Scaffold(
@@ -212,74 +214,6 @@ class _MainLayoutState extends State<MainLayout> {
     );
   }
 
-  Widget _buildSettingsScreen() {
-    return Container(
-      color: context.colors.background,
-      child: Column(
-        children: [
-          AppBar(
-            backgroundColor: context.colors.background,
-            title: Text("Ajustes", style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold)),
-            automaticallyImplyLeading: false,
-            elevation: 0,
-          ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Text(
-                  "APARIENCIA",
-                  style: TextStyle(color: context.colors.textMuted, fontWeight: FontWeight.bold, fontSize: 12),
-                ),
-                const SizedBox(height: 8),
-                Card(
-                  color: context.colors.surface,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: Container(
-                          width: 24, height: 24,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFFF003C), // Rojo
-                          ),
-                        ),
-                        title: Text("Tema Oscuro (Rojo Carmesí)", style: TextStyle(color: context.colors.textPrimary)),
-                        trailing: context.read<ThemeProvider>().currentTheme == AppThemeType.darkRed
-                            ? Icon(Icons.check, color: context.colors.primary)
-                            : null,
-                        onTap: () {
-                          context.read<ThemeProvider>().switchTheme(AppThemeType.darkRed);
-                        },
-                      ),
-                      Divider(height: 1, color: context.colors.borderFaint),
-                      ListTile(
-                        leading: Container(
-                          width: 24, height: 24,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFF1565C0), // Azul
-                          ),
-                        ),
-                        title: Text("Tema Claro (Azul Océano)", style: TextStyle(color: context.colors.textPrimary)),
-                        trailing: context.read<ThemeProvider>().currentTheme == AppThemeType.lightBlue
-                            ? Icon(Icons.check, color: context.colors.primary)
-                            : null,
-                        onTap: () {
-                          context.read<ThemeProvider>().switchTheme(AppThemeType.lightBlue);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
 
   Widget _buildNavItem(IconData icon, String label, int index) {
     bool isActive = _selectedIndex == index;
