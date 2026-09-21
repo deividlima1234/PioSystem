@@ -10,9 +10,9 @@ class UpdateService {
   final Dio _dio = Dio();
 
   Future<UpdateInfo?> checkForUpdates() async {
-    try {
-      final response = await _dio.get(
-        _updateUrl,
+    final url = "$_updateUrl?t=${DateTime.now().millisecondsSinceEpoch}";
+    final response = await _dio.get(
+        url,
         options: Options(
           headers: {
             // Evitar caché de github raw
@@ -34,10 +34,7 @@ class UpdateService {
 
         return UpdateInfo.fromJson(data, hasUpdate);
       }
-    } catch (e) {
-      print("Error checking for updates: $e");
-    }
-    return null;
+      throw Exception("Invalid status code: ${response.statusCode}");
   }
 
   bool _isVersionGreater(String newVersion, String currentVersion) {

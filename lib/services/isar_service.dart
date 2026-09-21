@@ -143,6 +143,27 @@ class IsarService {
     return false;
   }
 
+  Future<bool> updateCashierPin(String adminEmail, String adminPassword, String newPin) async {
+    final isar = await db;
+    final admin = await isar.users.filter()
+      .roleEqualTo(Role.admin)
+      .emailEqualTo(adminEmail)
+      .findFirst();
+
+    if (admin == null) return false;
+    
+    if (!CryptoUtils.verifyPassword(adminPassword, admin.passwordHash)) {
+      return false;
+    }
+
+    await isar.writeTxn(() async {
+      admin.pinHash = CryptoUtils.hashPassword(newPin);
+      await isar.users.put(admin);
+    });
+    
+    return true;
+  }
+
   // --- MÉTODOS DE CONSULTA UI ---
 
   Future<AppConfig?> getAppConfig() async {

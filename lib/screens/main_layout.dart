@@ -9,8 +9,10 @@ import '../theme/app_theme.dart';
 import '../services/update_service.dart';
 import '../widgets/update_modal.dart';
 import '../widgets/profile_modal_widget.dart';
+import '../widgets/about_modal_widget.dart';
 import '../services/isar_service.dart';
 import '../models/user.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -253,82 +255,8 @@ class _MainLayoutState extends State<MainLayout> {
     showModalBottomSheet(
       context: context,
       backgroundColor: context.readColors.transparent,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: context.colors.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 24),
-              decoration: BoxDecoration(
-                color: Colors.grey[700], // Keeping for subtle drag handle
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Icon(Icons.point_of_sale, size: 48, color: context.colors.primary),
-            const SizedBox(height: 16),
-            Text(
-              'PioSystem',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: context.colors.textPrimary),
-            ),
-            Text(
-              'Versión 1.0.0',
-              style: TextStyle(color: context.colors.textMuted),
-            ),
-            const SizedBox(height: 32),
-            Divider(color: context.colors.borderLight),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () async {
-                  Navigator.of(context).pop(); // Cerrar modal "Acerca de"
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Buscando actualizaciones...", style: TextStyle(color: context.colors.onPrimary)), backgroundColor: context.colors.primary));
-                  final updateInfo = await UpdateService().checkForUpdates();
-                  if (updateInfo != null && updateInfo.hasUpdate && mounted) {
-                    UpdateModal.show(context, updateInfo);
-                  } else if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Tienes la última versión instalada.", style: TextStyle(color: context.colors.onPrimary)), backgroundColor: context.colors.success));
-                  }
-                },
-                icon: Icon(Icons.sync, color: context.colors.onPrimary),
-                label: Text("Buscar Actualizaciones", style: TextStyle(color: context.colors.onPrimary, fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: context.colors.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            _buildCreditRow("Desarrollado por", "Eddam Eloy"),
-            const SizedBox(height: 12),
-            _buildCreditRow("Corporación", "EddamCore © 2026"),
-            const SizedBox(height: 40),
-            Text(
-              "Todos los derechos reservados",
-              style: TextStyle(fontSize: 10, color: context.colors.textMuted),
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCreditRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: TextStyle(color: context.colors.textMuted, fontSize: 13)),
-        Text(value, style: TextStyle(fontWeight: FontWeight.bold, color: context.colors.textPrimary)),
-      ],
+      isScrollControlled: true,
+      builder: (modalContext) => AboutModalWidget(parentContext: context),
     );
   }
 }

@@ -8,6 +8,7 @@ import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:app_settings/app_settings.dart';
 import '../widgets/bluetooth_scanner_modal.dart';
+import '../widgets/change_pin_modal.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -342,6 +343,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ],
               ),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // SECCIÓN: SEGURIDAD
+          Text(
+            'Seguridad',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: context.colors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            decoration: BoxDecoration(
+              color: context.colors.surfaceLight,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: context.colors.borderFaint),
+            ),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: context.colors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.password, color: context.colors.primary),
+                  ),
+                  title: Text('PIN de Cajero', style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.w600)),
+                  subtitle: Text('Modificar el PIN de 4 dígitos para cajeros', style: TextStyle(color: context.colors.textSecondary, fontSize: 13)),
+                  trailing: Icon(Icons.chevron_right, color: context.colors.textMuted),
+                  onTap: () {
+                    ChangePinModal.show(context);
+                  },
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 32),
