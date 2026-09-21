@@ -5,7 +5,7 @@ import '../models/update_info.dart';
 
 class UpdateService {
   // TODO: Reemplazar con la URL RAW de tu archivo update.json en GitHub
-  static const String _updateUrl = "https://raw.githubusercontent.com/USUARIO/piosystem/main/update.json";
+  static const String _updateUrl = "https://raw.githubusercontent.com/deividlima1234/PioSystem/main/update.json";
   
   final Dio _dio = Dio();
 
