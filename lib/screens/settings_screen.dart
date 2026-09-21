@@ -168,155 +168,180 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
 
           // SECCIÓN 1: DATOS DEL NEGOCIO
-          Text("DATOS DEL NEGOCIO", style: TextStyle(color: context.colors.textMuted, fontWeight: FontWeight.bold, fontSize: 12)),
-          const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: context.colors.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: context.colors.borderFaint),
             ),
-            child: Form(
-              key: _formKey,
-              child: Column(
+            child: Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                initiallyExpanded: false,
+                title: Text("DATOS DEL NEGOCIO", style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold, fontSize: 13)),
+                iconColor: context.colors.primary,
+                collapsedIconColor: context.colors.textSecondary,
+                childrenPadding: const EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 12),
                 children: [
-                  TextFormField(
-                    initialValue: _name,
-                    style: TextStyle(color: context.colors.textPrimary),
-                    decoration: InputDecoration(
-                      labelText: 'Nombre Comercial',
-                      labelStyle: TextStyle(color: context.colors.textMuted),
-                      filled: true, fillColor: context.colors.background,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    ),
-                    onSaved: (v) => _name = v ?? '',
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    initialValue: _ruc,
-                    style: TextStyle(color: context.colors.textPrimary),
-                    decoration: InputDecoration(
-                      labelText: 'RUC (Opcional)',
-                      labelStyle: TextStyle(color: context.colors.textMuted),
-                      filled: true, fillColor: context.colors.background,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    ),
-                    onSaved: (v) => _ruc = v ?? '',
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    initialValue: _address,
-                    style: TextStyle(color: context.colors.textPrimary),
-                    decoration: InputDecoration(
-                      labelText: 'Dirección (Opcional)',
-                      labelStyle: TextStyle(color: context.colors.textMuted),
-                      filled: true, fillColor: context.colors.background,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    ),
-                    onSaved: (v) => _address = v ?? '',
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    initialValue: _phone,
-                    style: TextStyle(color: context.colors.textPrimary),
-                    decoration: InputDecoration(
-                      labelText: 'Teléfono (Opcional)',
-                      labelStyle: TextStyle(color: context.colors.textMuted),
-                      filled: true, fillColor: context.colors.background,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    ),
-                    onSaved: (v) => _phone = v ?? '',
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _saveConfig,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: context.colors.primary,
-                        foregroundColor: context.colors.onPrimary,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: const Text("Guardar Datos", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          initialValue: _name,
+                          style: TextStyle(color: context.colors.textPrimary),
+                          decoration: InputDecoration(
+                            labelText: 'Nombre Comercial',
+                            labelStyle: TextStyle(color: context.colors.textMuted),
+                            filled: true, fillColor: context.colors.background,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          ),
+                          onSaved: (v) => _name = v ?? '',
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          initialValue: _ruc,
+                          style: TextStyle(color: context.colors.textPrimary),
+                          decoration: InputDecoration(
+                            labelText: 'RUC (Opcional)',
+                            labelStyle: TextStyle(color: context.colors.textMuted),
+                            filled: true, fillColor: context.colors.background,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          ),
+                          onSaved: (v) => _ruc = v ?? '',
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          initialValue: _address,
+                          style: TextStyle(color: context.colors.textPrimary),
+                          decoration: InputDecoration(
+                            labelText: 'Dirección (Opcional)',
+                            labelStyle: TextStyle(color: context.colors.textMuted),
+                            filled: true, fillColor: context.colors.background,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          ),
+                          onSaved: (v) => _address = v ?? '',
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          initialValue: _phone,
+                          style: TextStyle(color: context.colors.textPrimary),
+                          decoration: InputDecoration(
+                            labelText: 'Teléfono (Opcional)',
+                            labelStyle: TextStyle(color: context.colors.textMuted),
+                            filled: true, fillColor: context.colors.background,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          ),
+                          onSaved: (v) => _phone = v ?? '',
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _saveConfig,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: context.colors.primary,
+                              foregroundColor: context.colors.onPrimary,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: const Text("Guardar Datos", style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
 
           // SECCIÓN 2: IMPRESORA Y BLUETOOTH
-          Text("IMPRESIÓN", style: TextStyle(color: context.colors.textMuted, fontWeight: FontWeight.bold, fontSize: 12)),
-          const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
               color: context.colors.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: context.colors.borderFaint),
             ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              leading: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: context.colors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(Icons.print, color: context.colors.primary),
-              ),
-              title: Text("Conexión de Ticketera", style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold)),
-              subtitle: Text("Emparejar Bluetooth/USB", style: TextStyle(color: context.colors.textSecondary)),
-              trailing: ElevatedButton(
-                onPressed: _checkBluetoothAndShowScanner,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: context.colors.surfaceLight,
-                  foregroundColor: context.colors.primary,
-                  elevation: 0,
-                ),
-                child: const Text("Buscar"),
+            child: Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                initiallyExpanded: false,
+                title: Text("IMPRESIÓN", style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold, fontSize: 13)),
+                iconColor: context.colors.primary,
+                collapsedIconColor: context.colors.textSecondary,
+                childrenPadding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
+                children: [
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: context.colors.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.print, color: context.colors.primary),
+                    ),
+                    title: Text("Conexión de Ticketera", style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold)),
+                    subtitle: Text("Emparejar Bluetooth/USB", style: TextStyle(color: context.colors.textSecondary)),
+                    trailing: ElevatedButton(
+                      onPressed: _checkBluetoothAndShowScanner,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: context.colors.surfaceLight,
+                        foregroundColor: context.colors.primary,
+                        elevation: 0,
+                      ),
+                      child: const Text("Buscar"),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
 
           // SECCIÓN 3: TEMA Y APARIENCIA
-          Text("APARIENCIA", style: TextStyle(color: context.colors.textMuted, fontWeight: FontWeight.bold, fontSize: 12)),
-          const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
               color: context.colors.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: context.colors.borderFaint),
             ),
-            child: Column(
-              children: [
-                ListTile(
-                  leading: Container(
-                    width: 24, height: 24,
-                    decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFFF003C)),
+            child: Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                initiallyExpanded: false,
+                title: Text("APARIENCIA", style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold, fontSize: 13)),
+                iconColor: context.colors.primary,
+                collapsedIconColor: context.colors.textSecondary,
+                childrenPadding: const EdgeInsets.only(bottom: 8),
+                children: [
+                  ListTile(
+                    leading: Container(
+                      width: 24, height: 24,
+                      decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFFF003C)),
+                    ),
+                    title: Text("Tema Oscuro (Rojo Carmesí)", style: TextStyle(color: context.colors.textPrimary)),
+                    trailing: context.watch<ThemeProvider>().currentTheme == AppThemeType.darkRed
+                        ? Icon(Icons.check_circle, color: context.colors.primary)
+                        : null,
+                    onTap: () => context.read<ThemeProvider>().switchTheme(AppThemeType.darkRed),
                   ),
-                  title: Text("Tema Oscuro (Rojo Carmesí)", style: TextStyle(color: context.colors.textPrimary)),
-                  trailing: context.watch<ThemeProvider>().currentTheme == AppThemeType.darkRed
-                      ? Icon(Icons.check_circle, color: context.colors.primary)
-                      : null,
-                  onTap: () => context.read<ThemeProvider>().switchTheme(AppThemeType.darkRed),
-                ),
-                Divider(color: context.colors.borderFaint, height: 1),
-                ListTile(
-                  leading: Container(
-                    width: 24, height: 24,
-                    decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF1565C0)),
+                  Divider(color: context.colors.borderFaint, height: 1),
+                  ListTile(
+                    leading: Container(
+                      width: 24, height: 24,
+                      decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF1565C0)),
+                    ),
+                    title: Text("Tema Claro (Azul Moderno)", style: TextStyle(color: context.colors.textPrimary)),
+                    trailing: context.watch<ThemeProvider>().currentTheme == AppThemeType.lightBlue
+                        ? Icon(Icons.check_circle, color: context.colors.primary)
+                        : null,
+                    onTap: () => context.read<ThemeProvider>().switchTheme(AppThemeType.lightBlue),
                   ),
-                  title: Text("Tema Claro (Azul Moderno)", style: TextStyle(color: context.colors.textPrimary)),
-                  trailing: context.watch<ThemeProvider>().currentTheme == AppThemeType.lightBlue
-                      ? Icon(Icons.check_circle, color: context.colors.primary)
-                      : null,
-                  onTap: () => context.read<ThemeProvider>().switchTheme(AppThemeType.lightBlue),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 32),

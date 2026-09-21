@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/isar_service.dart';
+import '../services/print_service.dart';
 import '../models/order.dart';
 import '../theme/app_theme.dart';
+import '../widgets/ticket_shape.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -13,6 +15,7 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   final IsarService _isarService = IsarService();
+  final PrintService _printService = PrintService();
   List<Order> _orders = [];
   bool _isLoading = true;
 
@@ -36,6 +39,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
     // Necesitamos cargar los items del IsarLink
     await order.items.load();
     
+    // Obtener la configuración de negocio para el header del ticket
+    final config = await _isarService.getAppConfig();
+    final user = await _isarService.getFirstAdmin();
+    
     if (!mounted) return;
 
     showModalBottomSheet(
@@ -44,94 +51,187 @@ class _HistoryScreenState extends State<HistoryScreen> {
       isScrollControlled: true,
       builder: (context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.7,
-          decoration: BoxDecoration(
-            color: context.colors.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          padding: const EdgeInsets.all(24),
+          height: MediaQuery.of(context).size.height * 0.8,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: 50,
                 height: 5,
-                margin: const EdgeInsets.only(bottom: 24),
+                margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
                   color: context.colors.borderLight,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 alignment: Alignment.center,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Ticket ${order.ticketNumber}",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: context.colors.textPrimary),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: context.colors.success.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      order.status.name.toUpperCase(),
-                      style: TextStyle(color: context.colors.success, fontWeight: FontWeight.bold),
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                DateFormat('dd/MM/yyyy hh:mm a').format(order.createdAt),
-                style: TextStyle(color: context.colors.textSecondary),
-              ),
-              const SizedBox(height: 24),
-              Divider(color: context.colors.borderFaint),
-              const SizedBox(height: 16),
               Expanded(
-                child: ListView.builder(
-                  itemCount: order.items.length,
-                  itemBuilder: (context, index) {
-                    final item = order.items.elementAt(index);
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(item.productName, style: TextStyle(color: context.colors.textPrimary)),
-                      subtitle: Text("x${item.quantity}", style: TextStyle(color: context.colors.textSecondary)),
-                      trailing: Text(
-                        "S/ ${item.subtotal.toStringAsFixed(2)}",
-                        style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold),
-                      ),
-                    );
-                  },
+                child: CustomPaint(
+                  painter: TicketShape(color: context.colors.surface),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // CABECERA DEL NEGOCIO
+                        Text(
+                          config?.businessName.isNotEmpty == true ? config!.businessName : "PioSystem POS",
+                          style: TextStyle(
+                            fontFamily: 'Courier', 
+                            fontSize: 22, 
+                            fontWeight: FontWeight.bold, 
+                            color: context.colors.textPrimary
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (config?.ruc.isNotEmpty == true)
+                          Text("RUC: ${config!.ruc}", style: TextStyle(fontFamily: 'Courier', color: context.colors.textPrimary)),
+                        if (config?.address.isNotEmpty == true)
+                          Text(config!.address, style: TextStyle(fontFamily: 'Courier', color: context.colors.textPrimary), textAlign: TextAlign.center),
+                        if (config?.phone.isNotEmpty == true)
+                          Text("Tel: ${config!.phone}", style: TextStyle(fontFamily: 'Courier', color: context.colors.textPrimary)),
+                        
+                        const SizedBox(height: 16),
+                        Text(
+                          "--------------------------------",
+                          style: TextStyle(fontFamily: 'Courier', color: context.colors.textSecondary),
+                          maxLines: 1,
+                          overflow: TextOverflow.clip,
+                        ),
+                        const SizedBox(height: 8),
+
+                        // DATOS DEL TICKET
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Ticket:", style: TextStyle(fontFamily: 'Courier', color: context.colors.textPrimary)),
+                            Text(order.ticketNumber ?? "N/A", style: TextStyle(fontFamily: 'Courier', fontWeight: FontWeight.bold, color: context.colors.textPrimary)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Fecha:", style: TextStyle(fontFamily: 'Courier', color: context.colors.textPrimary)),
+                            Text(DateFormat('dd/MM/yyyy HH:mm').format(order.createdAt), style: TextStyle(fontFamily: 'Courier', color: context.colors.textPrimary)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Cajero:", style: TextStyle(fontFamily: 'Courier', color: context.colors.textPrimary)),
+                            Text(user?.name ?? "Cajero", style: TextStyle(fontFamily: 'Courier', color: context.colors.textPrimary)),
+                          ],
+                        ),
+                        
+                        const SizedBox(height: 8),
+                        Text(
+                          "--------------------------------",
+                          style: TextStyle(fontFamily: 'Courier', color: context.colors.textSecondary),
+                          maxLines: 1,
+                          overflow: TextOverflow.clip,
+                        ),
+                        const SizedBox(height: 8),
+                        
+                        // CABECERA PRODUCTOS
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("CANT. DESCRIPCION", style: TextStyle(fontFamily: 'Courier', fontWeight: FontWeight.bold, color: context.colors.textPrimary)),
+                            Text("IMPORTE", style: TextStyle(fontFamily: 'Courier', fontWeight: FontWeight.bold, color: context.colors.textPrimary)),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+
+                        // PRODUCTOS
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: order.items.length,
+                            itemBuilder: (context, index) {
+                              final item = order.items.elementAt(index);
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "${item.quantity}x ${item.productName}", 
+                                        style: TextStyle(fontFamily: 'Courier', color: context.colors.textPrimary)
+                                      ),
+                                    ),
+                                    Text(
+                                      "S/ ${item.subtotal.toStringAsFixed(2)}",
+                                      style: TextStyle(fontFamily: 'Courier', color: context.colors.textPrimary),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+                        Text(
+                          "--------------------------------",
+                          style: TextStyle(fontFamily: 'Courier', color: context.colors.textSecondary),
+                          maxLines: 1,
+                          overflow: TextOverflow.clip,
+                        ),
+                        const SizedBox(height: 8),
+
+                        // TOTALES
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("TOTAL:", style: TextStyle(fontFamily: 'Courier', fontWeight: FontWeight.bold, fontSize: 18, color: context.colors.textPrimary)),
+                            Text(
+                              "S/ ${order.totalAmount.toStringAsFixed(2)}",
+                              style: TextStyle(fontFamily: 'Courier', fontWeight: FontWeight.bold, fontSize: 18, color: context.colors.textPrimary),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("PAGO:", style: TextStyle(fontFamily: 'Courier', color: context.colors.textPrimary)),
+                            Text(order.paymentMethod?.name.toUpperCase() ?? 'EFECTIVO', style: TextStyle(fontFamily: 'Courier', color: context.colors.textPrimary)),
+                          ],
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        Text("Gracias por su preferencia", style: TextStyle(fontFamily: 'Courier', color: context.colors.textSecondary)),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-              Divider(color: context.colors.borderFaint),
               const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("TOTAL PAGADO", style: TextStyle(color: context.colors.textSecondary, fontSize: 18)),
-                  Text(
-                    "S/ ${order.totalAmount.toStringAsFixed(2)}",
-                    style: TextStyle(color: context.colors.primary, fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Enviando a Ticketera...")));
+                  onPressed: () async {
+                    if (config != null && user != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Imprimiendo Ticket...")));
+                      bool success = await _printService.printTicket(
+                        order: order,
+                        items: order.items.toList(),
+                        config: config,
+                        user: user,
+                      );
+                      if (!success && mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: const Text("Error al imprimir. Revisa la conexión con la ticketera."),
+                          backgroundColor: context.readColors.error,
+                        ));
+                      }
+                    }
                   },
-                  icon: Icon(Icons.print, color: context.colors.textPrimary),
-                  label: Text("Reimprimir Ticket", style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold)),
+                  icon: Icon(Icons.print, color: context.colors.onPrimary),
+                  label: Text("Reimprimir Ticket", style: TextStyle(color: context.colors.onPrimary, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: context.colors.borderFaint,
+                    backgroundColor: context.colors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),

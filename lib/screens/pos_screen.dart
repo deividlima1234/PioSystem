@@ -4,6 +4,7 @@ import '../models/order.dart';
 import '../models/product.dart';
 import '../theme/app_theme.dart';
 import '../widgets/profile_modal_widget.dart';
+import '../services/print_service.dart';
 
 class PosScreen extends StatefulWidget {
   const PosScreen({super.key});
@@ -99,7 +100,7 @@ class _PosScreenState extends State<PosScreen> {
 
     if (mounted) {
       _clearCart();
-      _showSuccessDialog(order.ticketNumber ?? "N/A");
+      _showSuccessDialog(order, items);
     }
   }
 
@@ -287,7 +288,8 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  void _showSuccessDialog(String ticketNumber) {
+  void _showSuccessDialog(Order order, List<OrderItem> items) {
+    final ticketNumber = order.ticketNumber ?? "N/A";
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -328,8 +330,26 @@ class _PosScreenState extends State<PosScreen> {
                       ),
                     ),
                     ElevatedButton.icon(
-                      onPressed: () {
+                      onPressed: () async {
                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Enviando a Ticketera...")));
+                        final config = await _isarService.getAppConfig();
+                        final user = await _isarService.getFirstAdmin();
+                        if (config != null && user != null) {
+                          bool success = await PrintService().printTicket(
+                            order: order,
+                            items: items,
+                            config: config,
+                            user: user,
+                          );
+                          if (!success && mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: const Text("Error al imprimir. Revisa conexión Bluetooth."),
+                              backgroundColor: context.readColors.error,
+                            ));
+                          } else if (mounted) {
+                            Navigator.of(context).pop();
+                          }
+                        }
                       },
                       icon: Icon(Icons.print, color: context.colors.textPrimary),
                       label: Text("Imprimir", style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold)),
