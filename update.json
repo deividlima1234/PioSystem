@@ -1,6 +1,6 @@
 {
-  "latestVersion": "1.0.0",
-  "releaseNotes": "Versión inicial del sistema POS.",
-  "downloadUrl": "",
+  "latestVersion": "1.1.0",
+  "releaseNotes": "Versión 1.1.0\n- Información de versión dinámica en menú Acerca de.\n- Correcciones menores.",
+  "downloadUrl": "https://github.com/deividlima1234/PioSystem/releases/download/v1.1.0/app-release.apk",
   "isMandatory": false
 }
