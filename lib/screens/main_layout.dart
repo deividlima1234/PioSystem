@@ -6,6 +6,8 @@ import 'catalog_screen.dart';
 import 'close_screen.dart';
 import 'settings_screen.dart';
 import '../theme/app_theme.dart';
+import '../services/update_service.dart';
+import '../widgets/update_modal.dart';
 import '../widgets/profile_modal_widget.dart';
 import '../services/isar_service.dart';
 import '../models/user.dart';
@@ -27,6 +29,14 @@ class _MainLayoutState extends State<MainLayout> {
   void initState() {
     super.initState();
     _loadUserData();
+    _checkForUpdatesInBackground();
+  }
+
+  Future<void> _checkForUpdatesInBackground() async {
+    final updateInfo = await UpdateService().checkForUpdates();
+    if (updateInfo != null && updateInfo.hasUpdate && mounted) {
+      UpdateModal.show(context, updateInfo);
+    }
   }
 
   Future<void> _loadUserData() async {
@@ -45,7 +55,6 @@ class _MainLayoutState extends State<MainLayout> {
 
     final List<Widget> screens = [
       const PosScreen(),
-      Center(child: Text("Cuentas Abiertas (En Desarrollo)", style: TextStyle(color: context.colors.textPrimary))),
       const CatalogScreen(),
       const HistoryScreen(),
       const CloseScreen(),
@@ -143,11 +152,10 @@ class _MainLayoutState extends State<MainLayout> {
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         children: [
                           _buildNavItem(Icons.point_of_sale, "Ventas", 0),
-                          _buildNavItem(Icons.table_restaurant, "Cuentas", 1),
-                          _buildNavItem(Icons.inventory_2_outlined, "Catálogo", 2),
-                          _buildNavItem(Icons.history, "Historial", 3),
-                          _buildNavItem(Icons.receipt_long, "Cierre", 4),
-                          _buildNavItem(Icons.settings, "Ajustes", 5),
+                          _buildNavItem(Icons.inventory_2_outlined, "Catálogo", 1),
+                          _buildNavItem(Icons.history, "Historial", 2),
+                          _buildNavItem(Icons.receipt_long, "Cierre", 3),
+                          _buildNavItem(Icons.settings, "Ajustes", 4),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Divider(color: context.colors.borderLight),
@@ -275,6 +283,29 @@ class _MainLayoutState extends State<MainLayout> {
             ),
             const SizedBox(height: 32),
             Divider(color: context.colors.borderLight),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  Navigator.of(context).pop(); // Cerrar modal "Acerca de"
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Buscando actualizaciones...", style: TextStyle(color: context.colors.onPrimary)), backgroundColor: context.colors.primary));
+                  final updateInfo = await UpdateService().checkForUpdates();
+                  if (updateInfo != null && updateInfo.hasUpdate && mounted) {
+                    UpdateModal.show(context, updateInfo);
+                  } else if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Tienes la última versión instalada.", style: TextStyle(color: context.colors.onPrimary)), backgroundColor: context.colors.success));
+                  }
+                },
+                icon: Icon(Icons.sync, color: context.colors.onPrimary),
+                label: Text("Buscar Actualizaciones", style: TextStyle(color: context.colors.onPrimary, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: context.colors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
             const SizedBox(height: 24),
             _buildCreditRow("Desarrollado por", "Eddam Eloy"),
             const SizedBox(height: 12),

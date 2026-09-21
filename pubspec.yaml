@@ -47,6 +47,9 @@ dependencies:
   blue_thermal_printer: ^1.2.3
   permission_handler: ^11.3.1
   app_settings: ^9.0.0
+  dio: ^5.11.1
+  package_info_plus: ^8.0.2
+  open_filex: ^4.7.0
 
 dev_dependencies:
   flutter_test:
