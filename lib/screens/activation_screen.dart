@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import '../utils/hardware_info.dart';
 import '../services/isar_service.dart';
@@ -31,10 +33,24 @@ class _ActivationScreenState extends State<ActivationScreen> {
 
   void _activate() async {
     String code = _codeController.text.trim();
-    // Lógica temporal: si el código es "EDD-4F8A-99B2", se activa
-    if (code == "EDD-4F8A-99B2") {
+    if (code.isEmpty) return;
+
+    // La misma sal secreta usada en el generador de claves
+    const secretSalt = "PioSystem_MasterKey_2026_@EddamCore";
+    
+    // Generar el hash localmente
+    var bytes = utf8.encode(_hardwareSignature + secretSalt);
+    var digest = sha256.convert(bytes);
+    
+    String hashString = digest.toString().toUpperCase();
+    String expectedPart1 = hashString.substring(0, 4);
+    String expectedPart2 = hashString.substring(4, 8);
+    String expectedPart3 = hashString.substring(8, 12);
+    String expectedCode = "$expectedPart1-$expectedPart2-$expectedPart3";
+
+    if (code == expectedCode) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Activando equipo...')),
+        SnackBar(content: Text('Activando equipo...', style: TextStyle(color: context.readColors.onPrimary)), backgroundColor: context.readColors.success),
       );
       
       await _isarService.activateDevice(_hardwareSignature, code);
@@ -46,7 +62,7 @@ class _ActivationScreenState extends State<ActivationScreen> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text('Código de Activación Inválido'), backgroundColor: context.colors.error),
+        SnackBar(content: Text('Código de Activación Inválido', style: TextStyle(color: context.readColors.onPrimary)), backgroundColor: context.readColors.error),
       );
     }
   }
