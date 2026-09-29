@@ -569,6 +569,7 @@ class _CloudClientsModuleState extends State<_CloudClientsModule> {
                   margin: const EdgeInsets.only(bottom: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: context.colors.borderLight)),
                   child: ListTile(
+                    onTap: () => _showBusinessDetails(context, b),
                     leading: CircleAvatar(
                       backgroundColor: isActive ? context.colors.success.withOpacity(0.2) : context.colors.error.withOpacity(0.2),
                       child: Icon(isActive ? Icons.check_circle : Icons.cancel, color: isActive ? context.colors.success : context.colors.error),
@@ -578,7 +579,7 @@ class _CloudClientsModuleState extends State<_CloudClientsModule> {
                     isThreeLine: true,
                     trailing: IconButton(
                       icon: Icon(Icons.settings, color: context.colors.primary),
-                      onPressed: () {},
+                      onPressed: () => _showBusinessDetails(context, b),
                     ),
                   ),
                 );
@@ -608,5 +609,118 @@ class _CloudClientsModuleState extends State<_CloudClientsModule> {
         ),
       ),
     );
+  }
+
+  void _showBusinessDetails(BuildContext context, dynamic b) {
+    bool isActive = b['active'] ?? false;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: context.colors.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Detalles de Empresa", style: TextStyle(color: context.colors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold)),
+                  IconButton(icon: Icon(Icons.close, color: context.colors.textSecondary), onPressed: () => Navigator.pop(ctx)),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _buildDetailRow("Nombre:", b['name'] ?? 'N/A', Icons.business),
+              _buildDetailRow("Propietario:", b['ownerName'] ?? 'No registrado', Icons.person),
+              _buildDetailRow("Teléfono:", b['phone'] ?? 'No registrado', Icons.phone),
+              _buildDetailRow("Email:", b['email'] ?? 'No registrado', Icons.email),
+              _buildDetailRow("RUC:", b['ruc'] ?? 'N/A', Icons.receipt),
+              _buildDetailRow("Límite Disp.:", "${b['maxDevices'] ?? 1}", Icons.devices),
+              _buildDetailRow("Plan:", b['planName'] ?? 'No especificado', Icons.star),
+              _buildDetailRow("Vencimiento:", b['subscriptionEndDate'] ?? 'Sin fecha', Icons.calendar_today),
+              const SizedBox(height: 24),
+              Text("Acciones Administrativas", style: TextStyle(color: context.colors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isActive ? context.colors.error : context.colors.success,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        _toggleBusinessStatus(b['id'], !isActive);
+                      },
+                      icon: Icon(isActive ? Icons.block : Icons.check_circle, color: Colors.white),
+                      label: Text(isActive ? "Suspender" : "Reactivar", style: const TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: context.colors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        _extendSubscription(b['id']);
+                      },
+                      icon: const Icon(Icons.add_circle, color: Colors.white),
+                      label: const Text("+1 Mes", style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Icon(icon, color: context.colors.primary, size: 20),
+          const SizedBox(width: 12),
+          Text(label, style: TextStyle(color: context.colors.textSecondary, fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(width: 8),
+          Expanded(child: Text(value, style: TextStyle(color: context.colors.textPrimary, fontSize: 16))),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _toggleBusinessStatus(String id, bool activate) async {
+    final url = activate ? "/businesses/$id/activate" : "/businesses/$id/suspend";
+    try {
+      final res = await http.put(Uri.parse('https://api-piosystem.colegiohuanoquite.org.pe/api/v1/superadmin$url'), headers: {'X-SuperAdmin-Key': 'EddamCore2026'});
+      if (res.statusCode == 200) {
+        _loadCloudData();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(activate ? "Empresa reactivada." : "Empresa suspendida.")));
+      }
+    } catch(e) {}
+  }
+
+  Future<void> _extendSubscription(String id) async {
+    try {
+      final res = await http.put(Uri.parse('https://api-piosystem.colegiohuanoquite.org.pe/api/v1/superadmin/businesses/$id/extend?months=1'), headers: {'X-SuperAdmin-Key': 'EddamCore2026'});
+      if (res.statusCode == 200) {
+        _loadCloudData();
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Suscripción extendida 1 mes.")));
+      }
+    } catch(e) {}
   }
 }
