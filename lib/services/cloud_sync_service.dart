@@ -74,4 +74,33 @@ class CloudSyncService {
       return false;
     }
   }
+
+  Future<bool> isLinked() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('cloud_jwt_token');
+    return token != null && token.isNotEmpty;
+  }
+
+  Future<bool> pullBackup() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('cloud_jwt_token');
+      
+      if (token == null) return false;
+
+      // TODO: Consumir endpoint real para descargar datos
+      // final response = await _dio.get(
+      //   "$baseUrl/backups/pull",
+      //   options: Options(headers: {"Authorization": "Bearer $token"}),
+      // );
+      
+      // Simulamos la descarga por ahora
+      await Future.delayed(const Duration(seconds: 3));
+      
+      return true;
+    } catch (e) {
+      print("Pull Backup Error: $e");
+      return false;
+    }
+  }
 }

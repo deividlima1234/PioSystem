@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../services/isar_service.dart';
 import 'activation_screen.dart';
 import '../theme/app_theme.dart';
+import '../widgets/cloud_sync_modal.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -47,6 +50,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.colors.background,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              final isDark = themeProvider.currentTheme == AppThemeType.darkRed;
+              return IconButton(
+                tooltip: 'Cambiar Tema',
+                icon: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 600),
+                  transitionBuilder: (child, animation) {
+                    return RotationTransition(
+                      turns: animation,
+                      child: FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: Icon(
+                    isDark ? Icons.light_mode : Icons.dark_mode,
+                    key: ValueKey(isDark ? 'light' : 'dark'),
+                    color: context.colors.textPrimary,
+                    size: 28,
+                  ),
+                ),
+                onPressed: () {
+                  themeProvider.switchTheme(
+                    isDark ? AppThemeType.lightBlue : AppThemeType.darkRed,
+                  );
+                },
+              );
+            },
+          ),
+          const SizedBox(width: 16),
+        ],
+      ),
       body: Center(
         child: SingleChildScrollView(
           child: Container(
@@ -55,10 +96,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.fastfood,
-                  size: 80,
-                  color: context.colors.primary,
+                SvgPicture.asset(
+                  'assets/logo.svg',
+                  width: 100,
+                  height: 100,
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -98,6 +139,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       )
                     ),
                     child: Text("Crear Cuenta Local", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: context.colors.textPrimary)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      // Importar e invocar el modal en modo login
+                      final result = await CloudSyncModal.show(context, isLoginMode: true);
+                      // Si el resultado es true (login exitoso), redirigir al home o la pantalla que corresponda
+                      // (Requiere recargar el main o navegar, por ahora lo dejamos así)
+                    },
+                    icon: Icon(Icons.cloud_download, color: context.colors.primary),
+                    label: Text("Restaurar desde PioSystem Cloud", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: context.colors.primary)),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: context.colors.primary, width: 2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      )
+                    ),
                   ),
                 )
               ],

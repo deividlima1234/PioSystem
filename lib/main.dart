@@ -57,6 +57,8 @@ class _PioSystemAppState extends State<PioSystemApp> {
           title: 'PioSystem',
           debugShowCheckedModeBanner: false,
           theme: themeProvider.themeData,
+          themeAnimationDuration: const Duration(milliseconds: 800),
+          themeAnimationCurve: Curves.easeInOutCubic,
           home: _isLoading 
               ? Scaffold(body: Center(child: CircularProgressIndicator(color: themeProvider.colors.primary)))
               : (!_hasAdmin 

@@ -13,6 +13,7 @@ import '../widgets/about_modal_widget.dart';
 import '../services/isar_service.dart';
 import '../models/user.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -135,7 +136,7 @@ class _MainLayoutState extends State<MainLayout> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 10),
-                          Icon(Icons.point_of_sale, color: context.colors.textPrimary, size: 48),
+                          SvgPicture.asset('assets/logo.svg', width: 64, height: 64),
                           const SizedBox(height: 10),
                           Text(
                             'PioSystem',

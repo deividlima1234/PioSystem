@@ -9,7 +9,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:app_settings/app_settings.dart';
 import '../widgets/bluetooth_scanner_modal.dart';
 import '../widgets/change_pin_modal.dart';
-
+import '../screens/cloud_paywall_screen.dart';
+import '../widgets/cloud_sync_modal.dart';
+import '../services/cloud_sync_service.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -20,9 +22,11 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final IsarService _isarService = IsarService();
   final _formKey = GlobalKey<FormState>();
+  final CloudSyncService _cloudSyncService = CloudSyncService();
   
   AppConfig? _config;
   bool _isLoading = true;
+  bool _isCloudLinked = false;
 
   String _name = '';
   String _ruc = '';
@@ -37,6 +41,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _loadConfig() async {
     final config = await _isarService.getAppConfig();
+    final isLinked = await _cloudSyncService.isLinked();
     if (mounted) {
       setState(() {
         _config = config;
@@ -44,6 +49,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _ruc = config?.ruc ?? '';
         _address = config?.address ?? '';
         _phone = config?.phone ?? '';
+        _isCloudLinked = isLinked;
         _isLoading = false;
       });
     }
@@ -389,42 +395,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // SECCIÓN 4: CLOUD BACKUP
           Text("RESPALDO EN LA NUBE", style: TextStyle(color: context.colors.textMuted, fontWeight: FontWeight.bold, fontSize: 12)),
           const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [context.colors.primaryDark, context.colors.primary],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+          GestureDetector(
+            onTap: () {
+              if (_isCloudLinked) {
+                CloudSyncModal.show(context);
+              } else {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CloudPaywallScreen()));
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [context.colors.primaryDark, context.colors.primary],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
               ),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.cloud_sync, color: context.colors.onPrimary, size: 48),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("PioSystem Cloud", style: TextStyle(color: context.colors.onPrimary, fontWeight: FontWeight.bold, fontSize: 18)),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Sincroniza tus ventas y protege tus datos automáticamente.",
-                        style: TextStyle(color: context.colors.onPrimary.withOpacity(0.9), fontSize: 12),
-                      ),
-                    ],
+              child: Row(
+                children: [
+                  Icon(Icons.cloud_sync, color: context.colors.onPrimary, size: 48),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("PioSystem Cloud", style: TextStyle(color: context.colors.onPrimary, fontWeight: FontWeight.bold, fontSize: 18)),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Sincroniza tus ventas y protege tus datos automáticamente.",
+                          style: TextStyle(color: context.colors.onPrimary.withOpacity(0.9), fontSize: 12),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: context.colors.onPrimary.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: context.colors.onPrimary.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(_isCloudLinked ? "Vinculado" : "Inactivo", style: TextStyle(color: context.colors.onPrimary, fontWeight: FontWeight.bold, fontSize: 10)),
                   ),
-                  child: Text("Próximamente", style: TextStyle(color: context.colors.onPrimary, fontWeight: FontWeight.bold, fontSize: 10)),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 40),

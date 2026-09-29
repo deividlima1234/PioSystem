@@ -3,6 +3,7 @@ import '../widgets/numpad_widget.dart';
 import '../services/isar_service.dart';
 import 'main_layout.dart';
 import '../theme/app_theme.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -106,10 +107,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.fastfood,
-                      size: isWide ? 120 : 80,
-                      color: context.colors.primary,
+                    SvgPicture.asset(
+                      'assets/logo.svg',
+                      width: isWide ? 150 : 100,
+                      height: isWide ? 150 : 100,
                     ),
                     const SizedBox(height: 24),
                     Text(
