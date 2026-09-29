@@ -4,7 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum AppThemeType {
   darkRed,
-  lightBlue
+  lightBlue,
+  superAdminDark,
+  superAdminLight
 }
 
 class AppColors {
@@ -101,6 +103,54 @@ class AppColors {
     black: Colors.black,
     transparent: Colors.transparent,
   );
+
+  static const AppColors superAdminDark = AppColors(
+    isDark: true,
+    primary: Colors.purpleAccent,
+    onPrimary: Colors.white,
+    primaryDark: Colors.deepPurple,
+    background: Color(0xFF0F0518),
+    surface: Color(0xFF1A0A2E),
+    surfaceDark: Color(0xFF150824),
+    surfaceLight: Color(0xFF2B124C),
+    overlay: Colors.black54,
+    textPrimary: Colors.white,
+    textSecondary: Colors.white70,
+    textMuted: Colors.grey,
+    borderLight: Colors.white24,
+    borderFaint: Colors.white12,
+    borderFaintest: Colors.white10,
+    success: Colors.greenAccent,
+    error: Colors.redAccent,
+    onError: Colors.white,
+    errorAccent: Colors.red,
+    black: Colors.black,
+    transparent: Colors.transparent,
+  );
+
+  static const AppColors superAdminLight = AppColors(
+    isDark: false,
+    primary: Colors.deepPurple,
+    onPrimary: Colors.white,
+    primaryDark: Color(0xFF4A148C),
+    background: Color(0xFFF3E5F5),
+    surface: Colors.white,
+    surfaceDark: Color(0xFFE1BEE7),
+    surfaceLight: Color(0xFFF8BBD0),
+    overlay: Colors.black54,
+    textPrimary: Color(0xFF1A1A1A),
+    textSecondary: Color(0xFF424242),
+    textMuted: Color(0xFF757575),
+    borderLight: Color(0xFFCE93D8),
+    borderFaint: Color(0xFFE1BEE7),
+    borderFaintest: Color(0xFFF3E5F5),
+    success: Colors.green,
+    error: Colors.red,
+    onError: Colors.white,
+    errorAccent: Colors.redAccent,
+    black: Colors.black,
+    transparent: Colors.transparent,
+  );
 }
 
 class ThemeProvider extends ChangeNotifier {
@@ -114,6 +164,10 @@ class ThemeProvider extends ChangeNotifier {
         return AppColors.darkRed;
       case AppThemeType.lightBlue:
         return AppColors.lightBlue;
+      case AppThemeType.superAdminDark:
+        return AppColors.superAdminDark;
+      case AppThemeType.superAdminLight:
+        return AppColors.superAdminLight;
     }
   }
 

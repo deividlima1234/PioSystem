@@ -5,6 +5,8 @@ import '../utils/hardware_info.dart';
 import '../services/isar_service.dart';
 import 'login_screen.dart';
 import '../theme/app_theme.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../widgets/super_admin_login_modal.dart';
 
 class ActivationScreen extends StatefulWidget {
   const ActivationScreen({super.key});
@@ -17,6 +19,28 @@ class _ActivationScreenState extends State<ActivationScreen> {
   final IsarService _isarService = IsarService();
   String _hardwareSignature = "Cargando...";
   final TextEditingController _codeController = TextEditingController();
+
+  // Super Admin Backdoor State
+  int _logoTapCount = 0;
+  DateTime? _lastLogoTap;
+
+  void _onLogoTapped() {
+    final now = DateTime.now();
+    if (_lastLogoTap == null || now.difference(_lastLogoTap!) > const Duration(seconds: 2)) {
+      _logoTapCount = 1;
+    } else {
+      _logoTapCount++;
+    }
+    _lastLogoTap = now;
+
+    if (_logoTapCount >= 5) {
+      _logoTapCount = 0;
+      showDialog(
+        context: context,
+        builder: (_) => const SuperAdminLoginModal(),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -87,10 +111,13 @@ class _ActivationScreenState extends State<ActivationScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.lock_outline,
-                size: 80,
-                color: context.colors.primary,
+              GestureDetector(
+                onTap: _onLogoTapped,
+                child: SvgPicture.asset(
+                  'assets/logo.svg',
+                  width: 80,
+                  height: 80,
+                ),
               ),
               const SizedBox(height: 24),
               Text(

@@ -4,6 +4,7 @@ import '../services/isar_service.dart';
 import 'main_layout.dart';
 import '../theme/app_theme.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../widgets/super_admin_login_modal.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -22,6 +23,28 @@ class _LoginScreenState extends State<LoginScreen> {
   // Admin State
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  // Super Admin Backdoor State
+  int _logoTapCount = 0;
+  DateTime? _lastLogoTap;
+
+  void _onLogoTapped() {
+    final now = DateTime.now();
+    if (_lastLogoTap == null || now.difference(_lastLogoTap!) > const Duration(seconds: 2)) {
+      _logoTapCount = 1;
+    } else {
+      _logoTapCount++;
+    }
+    _lastLogoTap = now;
+
+    if (_logoTapCount >= 5) {
+      _logoTapCount = 0;
+      showDialog(
+        context: context,
+        builder: (_) => const SuperAdminLoginModal(),
+      );
+    }
+  }
 
   void _onPinNumberTapped(String number) {
     if (_pin.length < 4) {
@@ -107,10 +130,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SvgPicture.asset(
-                      'assets/logo.svg',
-                      width: isWide ? 150 : 100,
-                      height: isWide ? 150 : 100,
+                    GestureDetector(
+                      onTap: _onLogoTapped,
+                      child: SvgPicture.asset(
+                        'assets/logo.svg',
+                        width: isWide ? 150 : 100,
+                        height: isWide ? 150 : 100,
+                      ),
                     ),
                     const SizedBox(height: 24),
                     Text(

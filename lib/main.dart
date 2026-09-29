@@ -5,6 +5,7 @@ import 'screens/activation_screen.dart';
 import 'screens/register_screen.dart';
 import 'services/isar_service.dart';
 import 'theme/app_theme.dart';
+import 'services/cloud_sync_service.dart';
 
 void main() {
   runApp(
@@ -41,6 +42,9 @@ class _PioSystemAppState extends State<PioSystemApp> {
     if (hasAdmin) {
       activated = await _isarService.isDeviceActivated();
     }
+
+    // Enviar Ping "Fantasma" de Telemetría (No bloqueante)
+    CloudSyncService().sendTelemetryPing();
 
     setState(() {
       _hasAdmin = hasAdmin;

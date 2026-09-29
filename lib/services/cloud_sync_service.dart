@@ -1,11 +1,29 @@
 import 'package:dio/dio.dart';
 import 'isar_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/hardware_info.dart';
 
 class CloudSyncService {
   final String baseUrl = "https://api-piosystem.colegiohuanoquite.org.pe/api/v1";
   final Dio _dio = Dio();
   final IsarService _isarService = IsarService();
+
+  Future<void> sendTelemetryPing() async {
+    try {
+      final String signature = await HardwareInfo.getDeviceSignature();
+      final bool cloudLinked = await isLinked();
+      
+      await _dio.post(
+        "$baseUrl/telemetry/ping",
+        data: {
+          "hardwareSignature": signature,
+          "isCloud": cloudLinked
+        },
+      );
+    } catch (e) {
+      print("Telemetry error: $e");
+    }
+  }
 
   Future<bool> login(String email, String password) async {
     try {

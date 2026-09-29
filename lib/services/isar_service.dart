@@ -183,6 +183,11 @@ class IsarService {
     return await isar.users.filter().roleEqualTo(Role.admin).findFirst();
   }
 
+  Future<List<User>> getAllUsers() async {
+    final isar = await db;
+    return await isar.users.where().findAll();
+  }
+
   // --- MÉTODOS DE VENTAS (ÓRDENES) ---
 
   Future<void> saveOrder(Order order, List<OrderItem> items) async {
